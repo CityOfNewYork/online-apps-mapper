@@ -1,0 +1,131 @@
+= extend('layouts/default');
+= partial('mixins/head.slm');
+
+= content('head');
+  = mixin('head');
+
+/ This should be a Vue component but the mixin seemed like an easy enough way to reuse it for now - DH
+/ = mixin('formstackOptions');
+
+= content('sidebar');
+  h2 Settings
+
+  div class='c-question'
+    label class='c-question__label' Fillable PDF
+    div class='c-question__container'
+      input(readonly class='w-full' v-bind:dir='(file.indexOf("/")) ? "ltr" : "rtl"' type='text' v-model='file' v-on:click='openPdfDialog')
+
+  div class='c-question'
+    label class='c-question__label' FormStack Form ID
+    div class='c-question__container'
+      input class='w-full' v-on:click='$event.target.select()' v-bind:value='form_id' v-on:blur='getForm($event.target.value)'
+
+  article class='c-accordion mt-0' id='api-settings'
+    header class='c-accordion__header'
+      p APP Settings
+      a class='c-accordion__toggle print:hidden' data-js='accordion' href='#api-settings__body'
+        span class='c-accordion__toggle-active' hide this list
+        span class='c-accordion__toggle-inactive' show this list
+    div class='c-accordion__body hidden:overflow animated bg-color-white' id='api-settings__body'
+      div class='c-accordion__padding'
+
+        div class='c-question'
+          label class='c-question__label' FormStack API Token
+          div class='c-question__container'
+            input class='w-full' v-model='token' v-on:click='$event.target.select()'
+
+        div class='c-question'
+          label class='c-question__label' PDFtk Server Path
+          div class='c-question__container'
+            input class='w-full' v-model='pdftk_path' v-on:click='$event.target.select()'
+
+        div class='c-question'
+          label class='c-question__label' Proxy
+          div class='c-question__container'
+            input class='w-full' v-model='proxy' v-on:click='$event.target.select()'
+
+
+= content('content');
+  div
+    h2 Create a Map
+
+    div class='layout--columns-gutter'
+      div
+        article class='c-accordion mt-0' id='fillable-pdf-fields'
+          header class='c-accordion__header'
+            p Fillable PDF Fields
+            a class='c-accordion__toggle print:hidden' data-js='accordion' href='#fillable-pdf-fields__body'
+              span class='c-accordion__toggle-active' hide this list
+              span class='c-accordion__toggle-inactive' show this list
+          div class='c-accordion__body hidden:overflow animated' id='fillable-pdf-fields__body'
+            div class='c-accordion__padding'
+              div
+                pre class='m-0 overflow-scroll' style='max-height:500px'
+                  = '{{ pdf }}';
+
+      div
+        article class='c-accordion mt-0' id='formstack-field-ids'
+          header class='c-accordion__header'
+            p FormStack Field IDs
+            a class='c-accordion__toggle print:hidden' data-js='accordion' href='#formstack-field-ids__body'
+              span class='c-accordion__toggle-active' hide this list
+              span class='c-accordion__toggle-inactive' show this list
+          div class='c-accordion__body hidden:overflow animated' id='formstack-field-ids__body'
+            div class='c-accordion__padding'
+              div
+                pre class='m-0 overflow-scroll' style='max-height:500px'
+                  = '{{ formstack }}';
+
+    div class='layout--columns-gutter'
+      div
+        div class='c-question'
+          label class='c-question__label' Fillable PDF Fields
+          div class='c-question__container'
+            select class='select w-full' v-on:change='newkey = $event.target.value;'
+              option Select a PDF Fillable Field
+              option(disabled) ---
+              option v-for='opt in pdf' v-bind:value='opt.FieldName' :key='opt.FieldName'
+                = '{{ opt.FieldName }}';
+
+      div
+        div class='c-question'
+          label class='c-question__label' FormStack Field IDs
+          div class='c-question__container'
+            formstack-options v-bind:options='formstack' v-bind:pdfkey='newkey' v-on:set-mapping='setMapping($event[0], $event[1])'
+
+  div
+    h2 Map
+
+    textarea class='w-full mb-3' v-on:click='$event.target.select()' v-bind:value='JSON.stringify(map, null, 2)' v-on:change='map = JSON.parse($event.target.value)'
+
+    div v-show='Object.keys(map).length'
+      div class='layout--columns-gutter p-2' v-for='(mapping, key, i) in map' :key='key' v-bind:class='{"color-mid-background": !(i % 2)}'
+        div = '{{ key }}';
+        div
+          div class='flex justify-between'
+            = '{{ mapping }}';
+            span class='flex-no-shrink'
+              a> class='cursor-pointer' v-on:click='deleteMapping(key)' Remove
+              a< class='cursor-pointer' v-on:click='updateToggle(key)'
+                span v-if='!(update[key])' Update
+                span(v-else) Close
+          div class='pt-1' v-if='update.hasOwnProperty(key)' v-show='update[key]'
+            formstack-options v-bind:options='formstack' v-bind:pdfkey='key' v-on:set-mapping='setMapping($event[0], $event[1])'
+
+= content('script');
+  script src='https://cdn.jsdelivr.net/gh/cityofnewyork/access-nyc-patterns@v0.1.0/dist/components/accordion/accordion.iffe.js'
+  script type='text/x-template' id='formstack-options'
+    select class='select w-full' v-on:change='$emit("set-mapping", [pdfkey, $event.target.value]);'
+      option Select a FormStack field ID
+      option(disabled) ---
+      option v-for='opt in options' v-if='!opt.options' v-bind:value='opt.id' :key='opt.id'
+        = '{{ opt.id }} | {{ opt.label }}';
+      optgroup v-for='optgroup in options' v-if='optgroup.options' v-bind:label='optgroup.label' :key='optgroup.id'
+        option v-for='opt in optgroup.options' v-bind:value='optgroup.id + " | " + opt.value' :key='opt.value'
+          = '{{ optgroup.id }} | {{ opt.value }}';
+
+  script src='../client/app.js'
+
+  javascript:
+    new Accordion();
+

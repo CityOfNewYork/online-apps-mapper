@@ -1,0 +1,15 @@
+doctype html
+html lang='en'
+  = content('head');
+
+  body style='visibility: hidden;' onload='load()'
+    form
+      main id='app' class='layout--sidebar min-h-screen text-font-size-small'
+        aside class='color-mid-background'
+          div class='p-4'
+            = content('sidebar');
+        article class='color-light-background'
+          div class='p-4'
+            = content('content');
+
+    = content('script');

@@ -1,0 +1,74 @@
+{
+  "name": "online-apps-mapper",
+  "productName": "online-apps-mapper",
+  "version": "0.0.1",
+  "description": "A JSON map generator for binding fillable PDF fields to FormStack fields.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "NODE_ENV=development nodemon -w src -e .js,.slm,.styl --exec \"electron-forge start\"",
+    "production": "NODE_ENV=production nodemon -w src -e .js,.slm,.styl --exec \"electron-forge start\"",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "eslint src --color"
+  },
+  "keywords": [],
+  "author": "NYC Opportunity <dehirth@nycopportunity.nyc.gov>",
+  "license": "GPL-3.0+",
+  "dependencies": {
+    "dotenv": "^6.2.0",
+    "electron-compile": "^6.4.3",
+    "electron-devtools-installer": "^2.2.4",
+    "electron-squirrel-startup": "^1.0.0",
+    "https-proxy-agent": "^2.2.1",
+    "node-fetch": "^2.3.0",
+    "node-pdftk": "^2.0.1",
+    "nodemon": "^1.18.7",
+    "pretty": "^2.0.0",
+    "slm": "^2.0.0",
+    "vue": "^2.5.20"
+  },
+  "devDependencies": {
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "electron-prebuilt-compile": "3.0.10",
+    "eslint": "^3",
+    "eslint-config-airbnb": "^15",
+    "eslint-plugin-import": "^2",
+    "eslint-plugin-jsx-a11y": "^5",
+    "eslint-plugin-react": "^7"
+  },
+  "config": {
+    "forge": {
+      "make_targets": {
+        "win32": [
+          "squirrel"
+        ],
+        "darwin": [
+          "zip"
+        ],
+        "linux": [
+          "deb",
+          "rpm"
+        ]
+      },
+      "electronPackagerConfig": {
+        "packageManager": "yarn"
+      },
+      "electronWinstallerConfig": {
+        "name": "online_apps_mapper"
+      },
+      "electronInstallerDebian": {},
+      "electronInstallerRedhat": {},
+      "github_repository": {
+        "owner": "",
+        "name": ""
+      },
+      "windowsStoreConfig": {
+        "packageName": "",
+        "name": "OnlineAppsMapper"
+      }
+    }
+  }
+}
